@@ -1,12 +1,50 @@
 import React from 'react';
 
 function Todo(props) {
-    let [newTodo, setNewTodo] = React.useState("")
+
+    let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234".split("");
+
+    let generatedIDs = new Set();
+    let newID;
     
+    const generateRandomID = (characters) => {
+        do {
+            newID = "";
+            for (let i = 0; i < 8; i++) {
+                newID += characters[Math.floor(Math.random() * characters.length)];
+            }
+        } while (generatedIDs.has(newID));
+    
+        generatedIDs.add(newID);
+    }
+    generateRandomID(characters)
+    
+
+    let [newTodo, setNewTodo] = React.useState("")
+    let [todo, setTodo] = React.useState([
+        {
+            todo: "Read Books",
+            id: newID,
+        }
+    ])
+
     let addTodo = (event) => {
         setNewTodo(event.target.value)
     }
-    console.log(newTodo)
+
+    const addBtn = () => {
+
+        setTodo(prev => {
+            return [
+                {
+                    todo: `${newTodo}`,
+                    id: newID, 
+                },
+                ...prev,
+            ]
+        })
+    }
+
     return (
         <div className='border-4 border-black w-11/12 sm:w-4/5 max-w-screen-2xl flex flex-col items-center rounded-xl'>
 
@@ -20,10 +58,16 @@ function Todo(props) {
                 onChange={addTodo}
                 />
 
-                <button className='bg-blue-500 text-white text-xs sm:text-base py-2  px-6 sm:px-10 rounded-full font-bold'>Add</button>
+                <button className='bg-blue-500 text-white text-xs sm:text-base py-2  px-6 sm:px-10 rounded-full font-bold' onClick={addBtn}>Add</button>
             </div>
 
-            <h1 className='font-semibold text-2xl'>{newTodo}</h1>
+            {todo.map((data, i) => {
+                return <div key={i} className='w-11/12 px-2 border-2 border-black my-2 rounded-md'>
+                    <h1 className='text-xl sm:text-4xl font-bold'>{i += 1} {data.todo}</h1>
+                    <h1 className='text-sm text-gray-400 font-bold'>id: {data.id}</h1>
+                </div>
+            })}
+            {/* <h1 className='font-semibold text-2xl'>{newTodo}</h1> */}
         </div>
     );
 }
