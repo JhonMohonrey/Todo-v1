@@ -35,10 +35,15 @@ function Todo(props) {
     //Default Todo
     let [todo, setTodo] = React.useState([
         {
-            todo: "Todo Testing!",
+            todo: "zz",
             id: newID,
             editState: false,
-        }
+        },
+        {
+            todo: "zzz",
+            id: "92890828",
+            editState: false,
+        },
     ])
 
     //Check if its duplicate
@@ -80,32 +85,38 @@ function Todo(props) {
 
         setTodo(data => {
             return data.map(prev => {
-                let x = newEditTodo.trim() ? newEditTodo : prev.todo
+                let x = newEditTodo.trim() ? newEditTodo : null
+                let data = x !== null ? newEditTodo : prev.todo
+                let filter = !dataTodo.has(data) ? data : prev.todo
                 
-                console.log("s",newEditTodo.trim())
-                console.log("x Result", x)
-                console.log("meow", !dataTodo.has(x))
-
                 return prev.id === id ?
                 {
                     ...prev,
-                    todo: !dataTodo.has(x) ? x : prev.todo,
+                    todo: `${filter}`,
                     editState: !prev.editState,
                 } : prev
             })
         })
+        setNewEditTodo("")
     }
+    console.log("Top test test", dataTodo)
+    dataTodo.delete("zzz")
+
+    console.log("Bottom test", dataTodo)
 
     //Function for delete
     const deleteBtn = (id) => {
-        console.log("Delete", dataTodo)
+        // console.log("Delete", dataTodo)
+
         setTodo(prev => {
             return prev.filter(data => {
-                dataTodo.delete(data.todo)
+                // dataTodo.delete(data.todo)
                 return data.id === id ? null : data
             })
         })
         // console.log("deh", [...dataTodo])
+
+        console.log(dataTodo)
 
     }
     // console.log("state ", todo)
