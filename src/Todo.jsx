@@ -35,16 +35,20 @@ function Todo(props) {
     //Default Todo
     let [todo, setTodo] = React.useState([
         {
-            todo: "zz",
+            todo: "Read Books",
             id: newID,
             editState: false,
+            isDelete: false,
         },
         {
-            todo: "zzz",
+            todo: "Play Games",
             id: "92890828",
             editState: false,
+            isDelete: false,
         },
     ])
+
+    //Leet Feedback if its Not Change or Duplicate
 
     //Check if its duplicate
     const duplicate = (todo, Set, type) => {
@@ -65,6 +69,7 @@ function Todo(props) {
                             todo: `${newTodo}`,
                             id: newID, 
                             editState: false,
+                            isDelete: false,
                         },
                         ...prev,
                     ]
@@ -81,8 +86,6 @@ function Todo(props) {
     }
     
     const EditAndSave = (id) => {
-        console.log("xxxx", dataTodo)
-
         setTodo(data => {
             return data.map(prev => {
                 let x = newEditTodo.trim() ? newEditTodo : null
@@ -99,44 +102,61 @@ function Todo(props) {
         })
         setNewEditTodo("")
     }
-    console.log("Top test test", dataTodo)
-    dataTodo.delete("zzz")
-
-    console.log("Bottom test", dataTodo)
 
     //Function for delete
     const deleteBtn = (id) => {
-        // console.log("Delete", dataTodo)
-
         setTodo(prev => {
             return prev.filter(data => {
-                // dataTodo.delete(data.todo)
                 return data.id === id ? null : data
             })
         })
-        // console.log("deh", [...dataTodo])
-
-        console.log(dataTodo)
-
     }
-    // console.log("state ", todo)
-    
+
+    //Create a confirm delete function here!
+    const feedBack = (data, id) => {
+        if (data === true) {
+            deleteBtn(id)
+        } else {
+            setTodo(prev => {
+                return prev.map(data => {
+                    return data.id === id ?
+                    {
+                        ...data,
+                        isDelete: !data.isDelete,
+                    } : data
+                })
+            })
+        }
+    }
+
+    //Are you sure? Delete this Todo
+    const ConfirmDelete = (id) => {
+        setTodo(prev => {
+            return prev.map(data => {
+                return data.id === id ?
+                {
+                    ...data,
+                    isDelete: !data.isDelete,
+                } : data
+            })
+        })
+    }
+
     const addBtn = (btnType, id) => {
         if (btnType === 1) {
             addingTodo()
         } else if (btnType === 2) {
             EditAndSave(id)
         } else {
-            deleteBtn(id)
+            // deleteBtn(id) //Important for Delete Todo
+            //If this click then confirm the confirm function 
+            ConfirmDelete(id)
         }
     }
 
     //True is for Id False is For String
     duplicate(todo, generatedIDs, true)
     duplicate(todo, dataTodo, false)
-    // console.log("xxx", generatedIDs)
-    // console.log("yyy", dataTodo)
-
     let btnDefault = ` text-xs sm:text-base py-2  px-6 sm:px-10 rounded-full font-bold mb-3`
 
     return (
@@ -157,7 +177,7 @@ function Todo(props) {
             </div>
 
             {todo.map((data, i) => {
-                return <div key={i} className='w-11/12 px-2 border-2 border-black my-2 rounded-md'>
+                return <div key={i} className='w-11/12 px-2 border-2 border-black my-2 rounded-md relative'>
                     {
                         data.editState ?
                         <>
@@ -167,14 +187,29 @@ function Todo(props) {
                             type="text" placeholder={`${data.todo}`} />
 
                             <button className={`${btnDefault} font-black bg-blue-400 text-white`} onClick={() => addBtn(2, data.id)} >Save</button>
+
+                        
                         </> :
                         <>
-                            <h1 className='text-xl sm:text-4xl font-bold'>{i += 1} {data.todo}</h1>
+                            <h1 className='text-xl sm:text-4xl font-bold'>{i += 1}.) {data.todo}</h1>
                             <h1 className='text-sm text-gray-400 font-bold'>id: {data.id}</h1>
 
-                            <button className='bg-gray-600 text-white text-xs sm:text-base py-2  px-4 sm:px-8 rounded-xl font-bold my-5' onClick={() => addBtn(2, data.id)}>Edit</button>
+                            <button className='bg-gray-600 text-white text-xs sm:text-base py-2  px-4 sm:px-8 rounded-xl font-bold sm:my-5' onClick={() => addBtn(2, data.id)}>Edit</button>
 
-                            <button className='bg-red-600 ml-2 text-white text-xs sm:text-base py-2  px-4 sm:px-8 rounded-xl font-bold my-5' onClick={() => addBtn(3, data.id)}>Delete</button>
+                            <button className='bg-red-600 ml-2 text-white text-xs sm:text-base py-2  px-4 sm:px-8 rounded-xl font-bold sm:my-5 my-2' onClick={() => addBtn(3, data.id)}>Delete</button>
+
+                            {data.isDelete ? 
+                                <div className='absolute border-2 border-black top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex
+                                flex-col py-2 px-8 bg-white rounded-2xl shadow-lg'>
+                                    <p className='text-center text-base font-semibold sm:text-2xl'>Are you sure?</p>
+    
+                                    <div className='flex items-center justify-center gap-2 mt-2 sm:px-14'>
+                                        <button className='bg-red-500 text-white px-4 rounded-lg sm:text-2xl' onClick={() => feedBack(true, data.id)} >Yes</button>
+                                        <button className='bg-blue-500 text-white px-4 rounded-lg sm:text-2xl' onClick={() => feedBack(false, data.id)}>No</button>
+                                    </div>
+                                </div>
+                            : null}
+                           
                         </>
                     }
                 </div>
@@ -184,3 +219,6 @@ function Todo(props) {
 }
 
 export default Todo;
+
+//Position absolute
+// Center = [absolute border-2 border-black top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2]
